@@ -12,6 +12,8 @@ const premitives = {
     string: Premitive('string'),
     number: Premitive('number'),
     bool: Premitive('boolean'),
+    int: typeby(Number.isInteger),
+    float: typeby(Number.isFinite),
     nil
 };
 
@@ -21,7 +23,8 @@ const optional = Type => typeby(instance =>
 
 const record = spec => class {
     static [Symbol.hasInstance](instance) {
-        return Object.keys(spec)
+        return isinstance(instance, Premitive('object')) &&
+               Object.keys(spec)
                      .every(prop => isinstance(instance[prop], spec[prop]));
     }
     static extended(xSpec) {

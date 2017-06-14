@@ -13,7 +13,14 @@ in the land of JavaScript.
 ```js
 import { isinstance, premitives } from 'xype';
 /*
-premitives = { number(1, 2.3, NaN, ...), string('hello'), bool(true, false), nil(null, undefined) }
+premitives = {
+  number(1, 2.3, NaN, ...),
+  int(1, 2),
+  float(1, 1.3),
+  string('hello'),
+  bool(true, false),
+  nil(null, undefined)
+}
 isinstance = basically, instanceof as a function
 */
 

@@ -19,6 +19,11 @@ test('Premitives', t => {
     t.is(isinstance(null, premitives.nil), true);
     t.is(isinstance(undefined, premitives.nil), true);
     t.is(isinstance(false, premitives.nil), false);
+    t.is(isinstance(1, premitives.int), true);
+    t.is(isinstance(1.4, premitives.int), false);
+    t.is(isinstance(1, premitives.float), true);
+    t.is(isinstance('1', premitives.float), false);
+    t.is(isinstance(1.4, premitives.float), true);
 });
 
 test('Optional', t => {

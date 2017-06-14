@@ -42,7 +42,7 @@ test('Records', t => {
 });
 
 test('Match', t => {
-    const isEven = val => match(val, [
+    const isEven = match([
         [premitives.number, x => x % 2, false],
         [premitives.number, true],
         false
@@ -51,7 +51,7 @@ test('Match', t => {
     t.is(isEven(2), true);
     t.is(isEven('2'), false);
 
-    const getAge = p => match(p, [
+    const getAge = match([
         [AgelessPerson, '-'],
         [Person, ({ age }) => age],
     ]);
@@ -61,14 +61,14 @@ test('Match', t => {
     delete p.age;
     t.is(getAge(p), '-');
 
-    const factorial = n => match(n, [
-        [1, n],
+    const factorial = match([
+        [1, 1],
         [premitives.number, n => n * factorial(n - 1)]
     ]);
 
     t.is(factorial(3), 6);
 
-    const tail = arr => match(arr, [
+    const tail = match([
         [Array, arr => arr.length, arr => arr.slice(1)],
         [[]]
     ]);

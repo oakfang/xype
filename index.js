@@ -29,23 +29,34 @@ const record = spec => class {
     }
 }
 
-function match(value, clauses) {
-    for (const clause of clauses) {
-        if (!Array.isArray(clause)) return clause;
-        if (clause.length === 1) return clause[0];
+const any = typeby(() => true);
+
+function match(clauses) {
+    const matchers = clauses.map(clause => {
+        if (!Array.isArray(clause)) {
+            return [any, () => true, clause];
+        }
         let [type, predicate, mapper] = clause;
-        if (mapper === undefined) {
-            mapper = predicate;
-            predicate = () => true;
+        if (predicate === undefined) {
+            return [any, () => true, type];
         }
         if (!(typeof type === 'function')) {
             const val = type;
             type = typeby(instance => instance === val);
         }
-        if (isinstance(value, type) && predicate(value)) {
-            return (typeof mapper) === 'function' ? mapper(value) : mapper; 
+        if (mapper === undefined) {
+            return [type, () => true, predicate];
         }
-    }
+        return [type, predicate, mapper];
+    });
+    return value => {
+        for (const matcher of matchers) {
+            const [type, predicate, mapper] = matcher;
+            if (isinstance(value, type) && predicate(value)) {
+                return (typeof mapper) === 'function' ? mapper(value) : mapper; 
+            }
+        }
+    };
 }
 
 module.exports = { optional, record, match, isinstance, premitives, typeby };

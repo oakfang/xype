@@ -7,12 +7,12 @@ const typeby = predicate =>
   };
 
 const nil = typeby(val => val == null);
-const Premitive = type => typeby(val => typeof val === type);
+const Primitive = type => typeby(val => typeof val === type);
 
-const premitives = {
-  string: Premitive("string"),
-  number: Premitive("number"),
-  bool: Premitive("boolean"),
+const primitives = {
+  string: Primitive("string"),
+  number: Primitive("number"),
+  bool: Primitive("boolean"),
   int: typeby(Number.isInteger),
   float: typeby(Number.isFinite),
   nil
@@ -21,14 +21,14 @@ const premitives = {
 const optional = Type =>
   typeby(
     instance =>
-      isinstance(instance, Type) || isinstance(instance, premitives.nil)
+      isinstance(instance, Type) || isinstance(instance, primitives.nil)
   );
 
 const record = spec =>
   class {
     static [Symbol.hasInstance](instance) {
       return (
-        isinstance(instance, Premitive("object")) &&
+        isinstance(instance, Primitive("object")) &&
         Object.keys(spec).every(prop => isinstance(instance[prop], spec[prop]))
       );
     }
@@ -59,4 +59,4 @@ function match(type, value) {
   return _match;
 }
 
-module.exports = { optional, record, match, isinstance, premitives, typeby };
+module.exports = { optional, record, match, isinstance, primitives, typeby };

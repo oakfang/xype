@@ -11,9 +11,9 @@ in the land of JavaScript.
 ### Basic type-checking
 
 ```js
-import { isinstance, premitives } from 'xype';
+import { isinstance, primitives } from 'xype';
 /*
-premitives = {
+primitives = {
   number(1, 2.3, NaN, ...),
   int(1, 2),
   float(1, 1.3),
@@ -24,15 +24,15 @@ premitives = {
 isinstance = basically, instanceof as a function
 */
 
-isinstance(3, premitives.number) // true
+isinstance(3, primitives.number) // true
 ```
 
 ### Optional
 `xype` introduces a new `optional<T>` type, which functions much like haskell's `Maybe<T>`.
 
 ```js
-import { isinstance, premitives, optional } from 'xype';
-const maybeNumber = optional(premitives.number);
+import { isinstance, primitives, optional } from 'xype';
+const maybeNumber = optional(primitives.number);
 isinstance(3, maybeNumber) // true
 isinstance(null, maybeNumber) // true
 isinstance('3', maybeNumber) // false
@@ -40,14 +40,14 @@ isinstance('3', maybeNumber) // false
 
 ### Records
 ```js
-import { isinstance, premitives, optional, record } from 'xype';
+import { isinstance, primitives, optional, record } from 'xype';
 const Person = record({
-    name: premitives.string,
-    age: optional(premitives.number),
+    name: primitives.string,
+    age: optional(primitives.number),
 });
 
 // Records can be extended infinitely
-const AgelessPerson = Person.extended({ age: premitives.nil });
+const AgelessPerson = Person.extended({ age: primitives.nil });
 const p = { name: 'Foo' };
 isinstance(p, Person); // true
 isinstance(p, AgelessPerson); // true
@@ -71,18 +71,18 @@ isinstance([1], EmptyArray) // false
 ## Matching
 `xype` exposes a relatively powerful matching function, aimimng to emulate haskell's pattern-matching capabilities.
 
-The `match` function matches a type/premitive and maps it to a function/value.
+The `match` function matches a type/primitive and maps it to a function/value.
 Otherwise, see examples below:
 
 ```js
-import { isinstance, premitives, optional, record, match } from 'xype';
+import { isinstance, primitives, optional, record, match } from 'xype';
 const Person = record({
-    name: premitives.string,
-    age: optional(premitives.number),
+    name: primitives.string,
+    age: optional(primitives.number),
 });
-const AgelessPerson = Person.extended({ age: premitives.nil });
+const AgelessPerson = Person.extended({ age: primitives.nil });
 
-const isEven = match(premitives.int, x => !(x % 2))
+const isEven = match(primitives.int, x => !(x % 2))
               .otherwise(false);
 t.is(isEven(1), false);
 t.is(isEven(2), true);
@@ -97,7 +97,7 @@ delete p.age;
 t.is(getAge(p), '-');
 
 const factorial = match(1, 1)
-                    .match(premitives.int, n => n * factorial(n - 1));
+                    .match(primitives.int, n => n * factorial(n - 1));
 
 t.is(factorial(3), 6);
 

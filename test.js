@@ -1,33 +1,33 @@
 import test from 'ava';
-import { optional, match, record, isinstance, premitives, typeby } from '.';
+import { optional, match, record, isinstance, primitives, typeby } from '.';
 
 const Person = record({
-    name: premitives.string,
-    age: optional(premitives.number),
+    name: primitives.string,
+    age: optional(primitives.number),
 });
 
-const AgelessPerson = Person.extended({ age: premitives.nil });
+const AgelessPerson = Person.extended({ age: primitives.nil });
 
-test('Premitives', t => {
-    t.is(isinstance(1, premitives.number), true);
-    t.is(isinstance('1', premitives.number), false);
-    t.is(isinstance('foo', premitives.string), true);
-    t.is(isinstance(true, premitives.string), false);
-    t.is(isinstance(true, premitives.bool), true);
-    t.is(isinstance(false, premitives.bool), true);
-    t.is(isinstance('', premitives.bool), false);
-    t.is(isinstance(null, premitives.nil), true);
-    t.is(isinstance(undefined, premitives.nil), true);
-    t.is(isinstance(false, premitives.nil), false);
-    t.is(isinstance(1, premitives.int), true);
-    t.is(isinstance(1.4, premitives.int), false);
-    t.is(isinstance(1, premitives.float), true);
-    t.is(isinstance('1', premitives.float), false);
-    t.is(isinstance(1.4, premitives.float), true);
+test('primitives', t => {
+    t.is(isinstance(1, primitives.number), true);
+    t.is(isinstance('1', primitives.number), false);
+    t.is(isinstance('foo', primitives.string), true);
+    t.is(isinstance(true, primitives.string), false);
+    t.is(isinstance(true, primitives.bool), true);
+    t.is(isinstance(false, primitives.bool), true);
+    t.is(isinstance('', primitives.bool), false);
+    t.is(isinstance(null, primitives.nil), true);
+    t.is(isinstance(undefined, primitives.nil), true);
+    t.is(isinstance(false, primitives.nil), false);
+    t.is(isinstance(1, primitives.int), true);
+    t.is(isinstance(1.4, primitives.int), false);
+    t.is(isinstance(1, primitives.float), true);
+    t.is(isinstance('1', primitives.float), false);
+    t.is(isinstance(1.4, primitives.float), true);
 });
 
 test('Optional', t => {
-    const maybeNum = optional(premitives.number);
+    const maybeNum = optional(primitives.number);
     t.is(isinstance(null, maybeNum), true);
     t.is(isinstance(undefined, maybeNum), true);
     t.is(isinstance(5, maybeNum), true);
@@ -47,7 +47,7 @@ test('Records', t => {
 });
 
 test('Match', t => {
-    const isEven = match(premitives.int, x => !(x % 2))
+    const isEven = match(primitives.int, x => !(x % 2))
                   .otherwise(false);
     t.is(isEven(1), false);
     t.is(isEven(2), true);
@@ -62,7 +62,7 @@ test('Match', t => {
     t.is(getAge(p), '-');
 
     const factorial = match(1, 1)
-                     .match(premitives.int, n => n * factorial(n - 1));
+                     .match(primitives.int, n => n * factorial(n - 1));
 
     t.is(factorial(3), 6);
 

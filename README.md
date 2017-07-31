@@ -71,7 +71,7 @@ isinstance([1], EmptyArray) // false
 ## Matching
 `xype` exposes a relatively powerful matching function, aimimng to emulate haskell's pattern-matching capabilities.
 
-The `match` function recieves an array of *matchers*. A *matcher* is either a non-array (which is always matched and is returned), or an array of the form: `[type, predicate, mapper]`. If the array consists of only 2 elements, the 2nd is considered the mapper, not the predicate. This function returns a function, which accepts a single parameter and returns the result of running it through the matchers.
+The `match` function matches a type/premitive and maps it to a function/value.
 Otherwise, see examples below:
 
 ```js
@@ -82,37 +82,30 @@ const Person = record({
 });
 const AgelessPerson = Person.extended({ age: premitives.nil });
 
-const isEven = match([
-    [premitives.number, x => x % 2, false], // If you're a number, and x % 2 results in non-zero, return false
-    [premitives.number, true], // otherwise, if you're a number, return true
-    false // return false, otherwise
-]);
+const isEven = match(premitives.int, x => !(x % 2))
+              .otherwise(false);
 t.is(isEven(1), false);
 t.is(isEven(2), true);
 t.is(isEven('2'), false);
 
-const getAge = match([
-    [AgelessPerson, '-'], // If you're an AgelessPerson, return '-'
-    [Person, ({ age }) => age], // If you're a Person, return age property
-    // otherwise, return undefined
-]);
+const getAge = match(AgelessPerson, '-')
+                .match(Person, ({ age }) => age);
 
 const p = { name: 'foo', age: 3 };
 t.is(getAge(p), 3);
 delete p.age;
 t.is(getAge(p), '-');
 
-const factorial = match([
-    [1, 1], // if n is 1, return 1
-    [premitives.number, n => n * factorial(n - 1)] // if n is a number, map it through the mapper function
-]);
+const factorial = match(1, 1)
+                    .match(premitives.int, n => n * factorial(n - 1));
 
 t.is(factorial(3), 6);
 
-const tail = match([
-    [Array, arr => arr.length, arr => arr.slice(1)], // if arr is a non-empty array, return slice from 2nd elemenet
-    [[]] // otherwise, return empty array
-]);
+const EmptyArray = typeby(arr => Array.isArray(arr) && arr.length === 0);
+
+const tail = match(EmptyArray, [])
+            .match(Array, arr => arr.slice(1))
+            .otherwise([]);
 t.is(tail([1, 2])[0], 2);
 t.is(tail(0).length, 0);
 ```

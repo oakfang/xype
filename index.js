@@ -1,65 +1,62 @@
 const isinstance = (instance, Type) => instance instanceof Type;
-const typeby = predicate => class {
+const typeby = predicate =>
+  class {
     static [Symbol.hasInstance](instance) {
-        return predicate(instance);
+      return predicate(instance);
     }
-};
+  };
 
 const nil = typeby(val => val == null);
-const Premitive = type => typeby(val => (typeof val) === type);
+const Premitive = type => typeby(val => typeof val === type);
 
 const premitives = {
-    string: Premitive('string'),
-    number: Premitive('number'),
-    bool: Premitive('boolean'),
-    int: typeby(Number.isInteger),
-    float: typeby(Number.isFinite),
-    nil
+  string: Premitive("string"),
+  number: Premitive("number"),
+  bool: Premitive("boolean"),
+  int: typeby(Number.isInteger),
+  float: typeby(Number.isFinite),
+  nil
 };
 
-const optional = Type => typeby(instance =>
-    isinstance(instance, Type) || isinstance(instance, premitives.nil)
-);
+const optional = Type =>
+  typeby(
+    instance =>
+      isinstance(instance, Type) || isinstance(instance, premitives.nil)
+  );
 
-const record = spec => class {
+const record = spec =>
+  class {
     static [Symbol.hasInstance](instance) {
-        return isinstance(instance, Premitive('object')) &&
-               Object.keys(spec)
-                     .every(prop => isinstance(instance[prop], spec[prop]));
+      return (
+        isinstance(instance, Premitive("object")) &&
+        Object.keys(spec).every(prop => isinstance(instance[prop], spec[prop]))
+      );
     }
     static extended(xSpec) {
-        return record(Object.assign({}, spec, xSpec));
+      return record(Object.assign({}, spec, xSpec));
     }
-}
+  };
 
-const any = typeby(() => true);
+const Fn = typeby(fn => typeof fn === "function");
+const Type = typeby(t => typeof t === "function" || typeof t === "object");
 
-function match(clauses) {
-    const matchers = clauses.map(clause => {
-        if (!Array.isArray(clause)) {
-            return [any, () => true, clause];
-        }
-        let [type, predicate, mapper] = clause;
-        if (predicate === undefined) {
-            return [any, () => true, type];
-        }
-        if (!(typeof type === 'function')) {
-            const val = type;
-            type = typeby(instance => instance === val);
-        }
-        if (mapper === undefined) {
-            return [type, () => true, predicate];
-        }
-        return [type, predicate, mapper];
-    });
-    return value => {
-        for (const matcher of matchers) {
-            const [type, predicate, mapper] = matcher;
-            if (isinstance(value, type) && predicate(value)) {
-                return (typeof mapper) === 'function' ? mapper(value) : mapper; 
-            }
-        }
-    };
+const getCallable = fn => (isinstance(fn, Fn) ? fn : () => fn);
+
+function match(type, value) {
+  const matchers = [{ type, value: getCallable(value) }];
+  function _match(val) {
+    for (const { type, value } of matchers) {
+      if (type && isinstance(type, Type) && isinstance(val, type)) return value(val);
+      else if (type && val === type)  return value(val);
+      else if (!type) return value(val);
+    }
+  }
+  _match.match = (type, value) => {
+    matchers.push({ type, value: getCallable(value) });
+    return _match;
+  };
+  _match.otherwise = value => _match.match(null, value);
+  return _match;
 }
 
 module.exports = { optional, record, match, isinstance, premitives, typeby };

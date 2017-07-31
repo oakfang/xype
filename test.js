@@ -1,5 +1,5 @@
 import test from 'ava';
-import { optional, match, record, isinstance, premitives } from '.';
+import { optional, match, record, isinstance, premitives, typeby } from '.';
 
 const Person = record({
     name: premitives.string,
@@ -47,36 +47,30 @@ test('Records', t => {
 });
 
 test('Match', t => {
-    const isEven = match([
-        [premitives.number, x => x % 2, false],
-        [premitives.number, true],
-        false
-    ]);
+    const isEven = match(premitives.int, x => !(x % 2))
+                  .otherwise(false);
     t.is(isEven(1), false);
     t.is(isEven(2), true);
     t.is(isEven('2'), false);
 
-    const getAge = match([
-        [AgelessPerson, '-'],
-        [Person, ({ age }) => age],
-    ]);
+    const getAge = match(AgelessPerson, '-')
+                  .match(Person, ({ age }) => age);
 
     const p = { name: 'foo', age: 3 };
     t.is(getAge(p), 3);
     delete p.age;
     t.is(getAge(p), '-');
 
-    const factorial = match([
-        [1, 1],
-        [premitives.number, n => n * factorial(n - 1)]
-    ]);
+    const factorial = match(1, 1)
+                     .match(premitives.int, n => n * factorial(n - 1));
 
     t.is(factorial(3), 6);
 
-    const tail = match([
-        [Array, arr => arr.length, arr => arr.slice(1)],
-        [[]]
-    ]);
+    const EmptyArray = typeby(arr => Array.isArray(arr) && arr.length === 0);
+
+    const tail = match(EmptyArray, [])
+                .match(Array, arr => arr.slice(1))
+                .otherwise([]);
     t.is(tail([1, 2])[0], 2);
     t.is(tail(0).length, 0);
 });

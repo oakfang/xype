@@ -4,7 +4,7 @@
   "description": "Runtime type checking and matching",
   "main": "index.js",
   "scripts": {
-    "test": "nyc ava -v"
+    "test": "nyc node test"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,8 @@
   },
   "homepage": "https://github.com/oakfang/xype#readme",
   "devDependencies": {
-    "ava": "^0.19.1",
+    "nefarious": "^2.1.0",
     "nyc": "^11.0.2"
-  }
+  },
+  "dependencies": {}
 }

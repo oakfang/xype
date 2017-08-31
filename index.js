@@ -44,12 +44,30 @@ const Type = typeby(t => typeof t === "function" || typeof t === "object");
 
 const getCallable = fn => (isinstance(fn, Fn) ? fn : () => fn);
 
+function variable(name, type) {
+  const v = { name, type };
+  v[Symbol.iterator] = () => {
+    v.isSpread = true;
+    return ([v])[Symbol.iterator]();
+  };
+  return v;
+}
+
+function varArrayToType(arr) {
+  if (arr.length === 0)
+    return typeby(array => Array.isArray(array) && !array.length);
+  const mapped = {};
+}
+
 function match(type, value) {
   const matchers = [{ type, value: getCallable(value) }];
   function _match(val) {
     for (const { type, value } of matchers) {
-      if (type && isinstance(type, Type) && isinstance(val, type)) return value(val);
-      else if (type && val === type)  return value(val);
+      console.log(type)
+      if (type && isinstance(type, Type) && isinstance(val, type)) {
+        return value(val);
+      }
+      else if (type && val === type) return value(val);
       else if (!type) return value(val);
     }
   }
@@ -61,4 +79,4 @@ function match(type, value) {
   return _match;
 }
 
-module.exports = { optional, record, match, isinstance, primitives, typeby };
+module.exports = { optional, record, match, isinstance, primitives, typeby, v: variable };

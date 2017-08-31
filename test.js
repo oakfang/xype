@@ -6,6 +6,10 @@ const Person = record({
     age: optional(primitives.number),
 });
 
+const Iterator = record({
+  [Symbol.iterator]: Function,
+});
+
 const AgelessPerson = Person.extended({ age: primitives.nil });
 
 test('primitives', t => {
@@ -44,6 +48,9 @@ test('Records', t => {
     delete p.name;
     t.is(isinstance(p, Person), false);
     t.is(isinstance(p, AgelessPerson), false);
+    t.is(isinstance([], Iterator), true);
+    t.is(isinstance(new Set(), Iterator), true);
+    t.is(isinstance(p, Iterator), false);
 });
 
 test('Match', t => {

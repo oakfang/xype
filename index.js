@@ -29,7 +29,9 @@ const record = spec =>
     static [Symbol.hasInstance](instance) {
       return (
         isinstance(instance, Primitive("object")) &&
-        Object.keys(spec).every(prop => isinstance(instance[prop], spec[prop]))
+        Object.keys(spec)
+              .concat(Object.getOwnPropertySymbols(spec))
+              .every(prop => isinstance(instance[prop], spec[prop]))
       );
     }
     static extended(xSpec) {

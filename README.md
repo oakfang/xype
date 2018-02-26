@@ -38,9 +38,20 @@ isinstance(null, maybeNumber) // true
 isinstance('3', maybeNumber) // false
 ```
 
+### Union
+`xype` uses, and exposes, the `Union<...Ts>` type, which functions like the `type ZipCode = String | Number` declaration.
+
+```js
+import { isinstance, primitives, union } from 'xype';
+const ZipCode = union(primitives.string, primitives.int);
+isinstance(3, ZipCode) // true
+isinstance(null, ZipCode) // false
+isinstance('3', ZipCode) // true
+```
+
 ### Records
 ```js
-import { isinstance, primitives, optional, record } from 'xype';
+import { isinstance, primitives, optional, record, union } from 'xype';
 const Person = record({
     name: primitives.string,
     age: optional(primitives.number),
@@ -57,6 +68,14 @@ isinstance(p, AgelessPerson); // false
 delete p.name
 isinstance(p, Person); // false
 isinstance(p, AgelessPerson); // false
+
+// Records are recursive
+const Address = record({
+    city: primitives.string,
+    street: primitives.string,
+    house: primitives.int,
+    zip: optional(union(primitives.string, primitives.int)),
+});
 ```
 
 ### Creating new types

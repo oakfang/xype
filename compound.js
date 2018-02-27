@@ -1,5 +1,6 @@
 const { isinstance, typeby } = require("./type-utils");
-const { any, type } = require("./meta");
+const { any, type, literal, union } = require("./meta");
+const { nil, number, string, bool } = require("./primitives");
 
 const Object_ = typeby(instance => instance && typeof instance === "object");
 
@@ -40,7 +41,22 @@ const record = spec => {
 
 const arrayOf = (type = any) => {
   type = reflectIntoCompoundType(type);
-  return typeby(arr => Array.isArray(arr) && arr.every(e => isinstance(e, type)));
+  return typeby(
+    arr => Array.isArray(arr) && arr.every(e => isinstance(e, type))
+  );
+};
+
+const tuple = (...values) => {
+  values = values.map(reflectIntoCompoundType);
+  return typeby(
+    arr =>
+      Array.isArray(arr) &&
+      arr.length === values.length &&
+      arr.reduce(
+        (flag, value, idx) => flag && isinstance(value, values[idx]),
+        true
+      )
+  );
 };
 
 function reflectIntoCompoundType(object, wrap = true) {
@@ -61,7 +77,10 @@ function reflectIntoCompoundType(object, wrap = true) {
     if (!wrap) return spec;
     return record(spec);
   }
+  if (isinstance(object, union(nil, number, string, bool))) {
+    return literal(object);
+  }
   return object;
 }
 
-module.exports = { record, arrayOf };
+module.exports = { record, arrayOf, tuple, _reflect: reflectIntoCompoundType };

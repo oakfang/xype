@@ -11,7 +11,8 @@ in the land of JavaScript.
 ### Basic type-checking
 
 ```js
-import { isinstance, primitives } from 'xype';
+import { isinstance } from 'xype/type-utils';
+import { number } from 'xype/primitives';
 /*
 primitives = {
   number(1, 2.3, NaN, ...),
@@ -19,20 +20,21 @@ primitives = {
   float(1, 1.3),
   string('hello'),
   bool(true, false),
-  nil(null, undefined)
+  nil(null, undefined),
+  fn(function foo() {})
 }
 isinstance = basically, instanceof as a function
 */
 
-isinstance(3, primitives.number) // true
+isinstance(3, number) // true
 ```
 
 ### Optional
 `xype` introduces a new `optional<T>` type, which functions much like haskell's `Maybe<T>`.
 
 ```js
-import { isinstance, primitives, optional } from 'xype';
-const maybeNumber = optional(primitives.number);
+import { isinstance, number, optional } from 'xype';
+const maybeNumber = optional(number);
 isinstance(3, maybeNumber) // true
 isinstance(null, maybeNumber) // true
 isinstance('3', maybeNumber) // false
@@ -42,8 +44,8 @@ isinstance('3', maybeNumber) // false
 `xype` uses, and exposes, the `Union<...Ts>` type, which functions like the `type ZipCode = String | Number` declaration.
 
 ```js
-import { isinstance, primitives, union } from 'xype';
-const ZipCode = union(primitives.string, primitives.int);
+import { isinstance, int, string, union } from 'xype';
+const ZipCode = union(string, int);
 isinstance(3, ZipCode) // true
 isinstance(null, ZipCode) // false
 isinstance('3', ZipCode) // true
@@ -51,14 +53,14 @@ isinstance('3', ZipCode) // true
 
 ### Records
 ```js
-import { isinstance, primitives, optional, record, union } from 'xype';
+import { isinstance, string, number, nil, optional, record, union } from 'xype';
 const Person = record({
-    name: primitives.string,
-    age: optional(primitives.number),
+    name: string,
+    age: optional(number),
 });
 
 // Records can be extended infinitely
-const AgelessPerson = Person.extended({ age: primitives.nil });
+const AgelessPerson = Person.extended({ age: nil });
 const p = { name: 'Foo' };
 isinstance(p, Person); // true
 isinstance(p, AgelessPerson); // true
@@ -71,11 +73,71 @@ isinstance(p, AgelessPerson); // false
 
 // Records are recursive
 const Address = record({
-    city: primitives.string,
-    street: primitives.string,
-    house: primitives.int,
-    zip: optional(union(primitives.string, primitives.int)),
+    city: string,
+    street: string,
+    house: int,
+    zip: optional(union(string, int)),
 });
+```
+
+### Typed Arrays
+```js
+import { int } from 'xype/primitives';
+import { arrayOf } from 'xype/compound';
+import { isinstance } = require('xype/type-utils');
+
+isinstance([2, 3, 4], arrayOf(int)); // true
+isinstance([2, 3, '3'], arrayOf(int)); // false
+isinstance([2, 3, '3'], arrayOf()); // true - defaults to type `any`
+```
+
+### Tuples
+```js
+import { int, string } from 'xype/primitives';
+import { tuple } from 'xype/compound';
+import { isinstance } = require('xype/type-utils');
+
+const HTTPStatusCode = tuple(int, string);
+isinstance([500, 'Internal Error'], HTTPStatusCode); // true
+isinstance([500], HTTPStatusCode); // false
+isinstance([500, 'Internal Error', 'Some Extra data'], HTTPStatusCode); // false
+```
+
+### Compound Reflection
+```js
+import { record } from 'xype/compound';
+import { int, string } from 'xype/primitives';
+import { optional, union } from 'xype/meta';
+const EnabledUser = record({
+  username: string,
+  address: {
+    city: string,
+    street: string,
+    house: int,
+    zip: optional(union(int, string)),
+  },
+  enabled: true,
+  comments: [
+      { content: string }
+  ]
+});
+/*
+This is equal to:
+import { record, arrayOf } from 'xype/compound';
+import { int, string } from 'xype/primitives';
+import { optional, union, literal } from 'xype/meta';
+const EnabledUser = record({
+  username: string,
+  address: record({
+    city: string,
+    street: string,
+    house: int,
+    zip: optional(union(int, string)),
+  }),
+  enabled: literal(true),
+  comments: arrayOf({ content: string })
+});
+*/
 ```
 
 ### Creating new types
@@ -85,12 +147,16 @@ const EmptyArray = typeby(instance => Array.isArray(instance) && instance.length
 
 isinstance([], EmptyArray) // true
 isinstance([1], EmptyArray) // false
+
+// however, for this instance you should probably go for a `tuple()`
 ```
 
 ## Matching
 `xype` exposes a relatively powerful matching function, aimimng to emulate haskell's pattern-matching capabilities.
 
 The `match` function matches a type/primitive and maps it to a function/value.
+It uses the above mentioned reflection system for its `type` arguments, so objects are turned into `record` types,
+arrays turn into `arrayOf<T>` and numbers/strings/null/booleans become `literal<V>` types.
 Otherwise, see examples below:
 
 ```js

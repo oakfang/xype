@@ -15,4 +15,6 @@ const type = typeby(
     Symbol.hasInstance in t
 );
 
-module.exports = { union, optional, any, type };
+const literal = value => typeby(t => t === value);
+
+module.exports = { union, optional, any, type, literal };

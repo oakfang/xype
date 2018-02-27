@@ -11,7 +11,8 @@ import {
   nil,
   float,
   int,
-  typeby
+  typeby,
+  tuple
 } from ".";
 
 const Person = record({
@@ -189,4 +190,20 @@ test("Reflect entire schema", t => {
     ),
     true
   );
+});
+
+test("Tuples", t => {
+  const Result = tuple(int, string);
+  const isResult = v => isinstance(v, Result);
+  t.is(isResult([5, "foo"]), true);
+  t.is(isResult([5, "foo", 1]), false);
+  t.is(isResult([5, 4]), false);
+});
+
+test("Reflection of literals", t => {
+  const T = record({
+    age: 34
+  });
+  t.is(isinstance({ age: 34 }, T), true);
+  t.is(isinstance({ age: 33 }, T), false);
 });

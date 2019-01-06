@@ -6,15 +6,13 @@ const Object_ = typeby(instance => instance && typeof instance === 'object');
 
 const record = spec => {
   spec = reflectIntoCompoundType(spec, false);
-  return class {
-    static [Symbol.hasInstance](instance) {
-      return (
-        isinstance(instance, Object_) &&
-        Object.keys(spec)
-          .concat(Object.getOwnPropertySymbols(spec))
-          .every(prop => isinstance(instance[prop], spec[prop]))
-      );
-    }
+  return class extends typeby(
+    instance =>
+      isinstance(instance, Object_) &&
+      Object.keys(spec)
+        .concat(Object.getOwnPropertySymbols(spec))
+        .every(prop => isinstance(instance[prop], spec[prop]))
+  ) {
     static extended(xSpec) {
       return record(Object.assign({}, spec, xSpec));
     }

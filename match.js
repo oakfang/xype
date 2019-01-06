@@ -1,7 +1,7 @@
-const { isinstance } = require("./type-utils");
+const { isinstance } = require('./type-utils');
 const { _reflect } = require('./compound');
-const { fn: Fn } = require("./primitives");
-const { type: Type } = require("./meta");
+const { fn: Fn } = require('./primitives');
+const { type: Type } = require('./meta');
 
 const getCallable = fn => (isinstance(fn, Fn) ? fn : () => fn);
 
@@ -13,7 +13,10 @@ module.exports = function match(type, value) {
     }
   }
   _match.match = (type, value) => {
-    matchers.push({ type: type !== undefined && _reflect(type), value: getCallable(value) });
+    matchers.push({
+      type: type !== undefined && _reflect(type),
+      value: getCallable(value),
+    });
     return _match;
   };
   _match.otherwise = value => _match.match(undefined, value);

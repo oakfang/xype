@@ -1,8 +1,8 @@
-const { isinstance, typeby } = require("./type-utils");
-const { any, type, literal, union } = require("./meta");
-const { nil, number, string, bool } = require("./primitives");
+const { isinstance, typeby } = require('./type-utils');
+const { any, type, literal, union } = require('./meta');
+const { nil, number, string, bool } = require('./primitives');
 
-const Object_ = typeby(instance => instance && typeof instance === "object");
+const Object_ = typeby(instance => instance && typeof instance === 'object');
 
 const record = spec => {
   spec = reflectIntoCompoundType(spec, false);
@@ -30,7 +30,7 @@ const record = spec => {
               ? Object.assign(copy, {
                   [prop]: spec[prop].sanitise
                     ? spec[prop].sanitise(object[prop])
-                    : object[prop]
+                    : object[prop],
                 })
               : copy,
           {}
@@ -62,7 +62,7 @@ const tuple = (...values) => {
 function reflectIntoCompoundType(object, wrap = true) {
   if (Array.isArray(object)) {
     if (object.length > 1) {
-      throw new Error("Reflecteed array can only have up to 1 type argument");
+      throw new Error('Reflecteed array can only have up to 1 type argument');
     }
     return arrayOf(object[0]);
   }

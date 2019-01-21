@@ -2,6 +2,9 @@ const isinstance = (instance, Type) => instance instanceof Type;
 
 const _typesByString = {
   [Array]: Array,
+  [Error]: Error,
+  [Promise]: Promise,
+  [Object]: Object,
 };
 const typeby = predicate => {
   const label = `@@type//${Object.keys(_typesByString).length}`;

@@ -7,6 +7,7 @@ const union = (...ofTypes) =>
 const optional = Type => union(Type, nil);
 
 const any = typeby(() => true);
+const not = Type => typeby(v => !isinstance(v, Type));
 
 const type = typeby(
   t =>
@@ -17,4 +18,4 @@ const type = typeby(
 
 const literal = value => typeby(t => t === value);
 
-module.exports = { union, optional, any, type, literal };
+module.exports = { union, optional, any, type, literal, not };

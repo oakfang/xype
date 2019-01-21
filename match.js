@@ -9,7 +9,7 @@ const getType = typeAsString => {
   return byLabel ? byLabel : JSON.parse(typeAsString);
 };
 
-module.exports = function match(matchers, fallback) {
+function _match(matchers, fallback) {
   return val => {
     for (const [type, value] of Object.entries(matchers)) {
       if (isinstance(val, _reflect(getType(type)))) {
@@ -21,4 +21,15 @@ module.exports = function match(matchers, fallback) {
     }
     throw new Error('No valid match was found, and no fallback was provided');
   };
-};
+}
+
+function match(...args) {
+  const [mapper, fallback] = args;
+  if (isinstance(mapper, Fn)) {
+    return (base, ...matchArgs) =>
+      _match(mapper(...matchArgs), fallback)(base);
+  }
+  return _match(mapper, fallback);
+}
+
+module.exports = match;

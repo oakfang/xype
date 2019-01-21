@@ -217,4 +217,14 @@ const strictFib = match({
 });
 t.is(strictFib(4), 5);
 t.throws(() => strictFib('foo'));
+
+const get = match((prop, fallback = null) => ({
+  [record({ [prop]: not(nil) })]: obj => obj[prop],
+  [any]: fallback,
+}));
+const user = {
+  username: 'foobar',
+};
+t.is(get(user, 'username'), 'foobar');
+t.is(get(user, 'meow', 5), 5);
 ```

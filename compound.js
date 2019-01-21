@@ -6,12 +6,13 @@ const Object_ = typeby(instance => instance && typeof instance === 'object');
 
 const record = spec => {
   spec = reflectIntoCompoundType(spec, false);
+  const specEntries = Object.keys(spec)
+    .concat(Object.getOwnPropertySymbols(spec))
+    .map(key => [key, spec[key]]);
   return class extends typeby(
     instance =>
       isinstance(instance, Object_) &&
-      Object.keys(spec)
-        .concat(Object.getOwnPropertySymbols(spec))
-        .every(prop => isinstance(instance[prop], spec[prop]))
+      specEntries.every(([prop, type]) => isinstance(instance[prop], type))
   ) {
     static extended(xSpec) {
       return record(Object.assign({}, spec, xSpec));
@@ -20,19 +21,17 @@ const record = spec => {
       if (!isinstance(object, this)) {
         return null;
       }
-      return Object.keys(spec)
-        .concat(Object.getOwnPropertySymbols(spec))
-        .reduce(
-          (copy, prop) =>
-            object[prop] !== undefined
-              ? Object.assign(copy, {
-                  [prop]: spec[prop].sanitise
-                    ? spec[prop].sanitise(object[prop])
-                    : object[prop],
-                })
-              : copy,
-          {}
-        );
+      return specEntries.reduce(
+        (copy, [prop, type]) =>
+          object[prop] !== undefined
+            ? Object.assign(copy, {
+                [prop]: type.sanitise
+                  ? type.sanitise(object[prop])
+                  : object[prop],
+              })
+            : copy,
+        {}
+      );
     }
   };
 };

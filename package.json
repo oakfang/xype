@@ -1,10 +1,10 @@
 {
   "name": "xype",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Runtime type checking and matching",
   "main": "index.js",
   "scripts": {
-    "test": "nyc ava -v"
+    "test": "nyc node test"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
     "records"
   ],
   "engines": {
-    "node": ">=6.9"
+    "node": ">=10"
   },
   "author": "Alon Niv",
   "license": "MIT",
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/oakfang/xype#readme",
   "devDependencies": {
-    "ava": "^0.19.1",
+    "nefarious": "^3.1.0",
     "nyc": "^11.9.0"
   }
 }

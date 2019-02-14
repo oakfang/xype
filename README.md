@@ -171,7 +171,7 @@ arrays turn into `arrayOf<T>` and numbers/strings/null/booleans become `literal<
 Otherwise, see examples below:
 
 ```js
-import { isinstance, primitives, optional, record, match } from 'xype';
+import { isinstance, primitives, optional, record, match, matchTo } from 'xype';
 const isEven = match(
   {
     [int]: x => !(x % 2),
@@ -227,4 +227,14 @@ const user = {
 };
 t.is(get(user, 'username'), 'foobar');
 t.is(get(user, 'meow', 5), 5);
+
+// matchTo is used to match expression without creating a function
+const num = 3;
+const isNumEven = matchTo(
+  num, // notice the explicit parameter
+  {
+    [int]: x => !(x % 2),
+  },
+  false
+); // false
 ```

@@ -80,4 +80,4 @@ function reflectIntoCompoundType(object, wrap = true) {
   return object;
 }
 
-module.exports = { record, arrayOf, tuple, _reflect: reflectIntoCompoundType };
+module.exports = { record, arrayOf, tuple, reflectIntoCompoundType };

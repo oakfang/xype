@@ -1,5 +1,15 @@
 const test = require('nefarious');
-const { optional, record, string, number, nil, int, match, typeby } = require('..');
+const {
+  optional,
+  record,
+  string,
+  number,
+  nil,
+  int,
+  match,
+  typeby,
+  matchTo,
+} = require('..');
 
 const Person = record({
   name: string,
@@ -7,6 +17,43 @@ const Person = record({
 });
 
 const AgelessPerson = Person.extended({ age: nil });
+
+test('Match to', t => {
+  const Maybe = T => ({
+    Nothing: nil,
+    Just: T,
+  });
+  t.is(
+    matchTo(3, {
+      [Maybe(number).Nothing]: 0,
+      [Maybe(number).Just]: x => x,
+    }),
+    3
+  );
+  t.is(
+    matchTo(null, {
+      [Maybe(number).Nothing]: 0,
+      [Maybe(number).Just]: x => x,
+    }),
+    0
+  );
+  t.is(
+    matchTo(
+      4,
+      {
+        4: true,
+      },
+      false
+    ),
+    true
+  );
+  t.is(
+    matchTo('Hello', {
+      Hello: str => str.length,
+    }),
+    5
+  );
+});
 
 test('Match', t => {
   const isEven = match(
